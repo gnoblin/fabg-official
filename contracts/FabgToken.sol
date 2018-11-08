@@ -14,10 +14,20 @@ contract FabgToken is ERC721Token, Ownable {
     
     mapping(uint256 => data) internal tokens;
     mapping(uint256 => uint256) internal pricesForIncreasingAuction;
+    
+    address presale;
 
     enum tokenType{MASK, LAND}
     
     event TokenCreated(
+        address Receiver, 
+        tokenType Type, 
+        bytes32 Name, 
+        bytes32 URL, 
+        uint256 TokenId, 
+        bool IsSnatchable
+    );
+    event TokenChanged(
         address Receiver, 
         tokenType Type, 
         bytes32 Name, 
@@ -191,4 +201,39 @@ contract FabgToken is ERC721Token, Ownable {
         return ownedTokens[_owner];
     }
     
+    /**
+     * @dev store information about presale contract
+     * @param _presale address of presale contract
+     */ 
+    function setPresaleAddress(address _presale) public onlyOwner {
+        presale = _presale;
+    }
+
+    /**
+     * @dev process of changing information of card 
+     * @param _receiver address of token receiver
+     * @param _type type of token from enum
+     * @param _name bytes32 name of token
+     * @param _url bytes32 url of token
+     * @param _isSnatchable type of market for trading
+     */    
+    function rewriteTokenFromPresale(
+        uint256 _tokenId,
+        address _receiver, 
+        uint256 _price, 
+        tokenType _type, 
+        bytes32 _name, 
+        bytes32 _url, 
+        bool _isSnatchable
+    ) public onlyOwner {
+        require(ownerOf(_tokenId) == presale);
+        data memory info = data(_type, _name, _url, _isSnatchable);
+        tokens[_tokenId] = info;
+        
+        if(_isSnatchable == true) {
+            pricesForIncreasingAuction[_tokenId] = _price;
+        }
+        
+        emit TokenChanged(_receiver, _type, _name, _url, _tokenId, _isSnatchable);
+    }
 }

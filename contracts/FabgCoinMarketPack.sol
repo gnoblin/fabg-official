@@ -3,9 +3,8 @@ pragma solidity ^0.4.24;
 import "./FabgCoin.sol";
 import "./OZ/Ownable.sol";
 import "./OZ/SafeMath.sol";
-import "zos-lib/contracts/Initializable.sol";
 
-contract FabgCoinMarketPack is FabgCoin, Initializable {
+contract FabgCoinMarketPack is FabgCoin {
     using SafeMath for uint256;
 
     bool isPausedForSale;
